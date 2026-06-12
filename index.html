@@ -1289,10 +1289,24 @@ async function fetchHolders() {
       { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
     );
     const d = await r.json();
-    if (d && typeof d.totalHolders === 'number') {
-      document.getElementById('s-holders').textContent = d.totalHolders.toLocaleString();
+    console.log('Holders response:', JSON.stringify(d));
+    const count = d?.totalHolders ?? d?.total ?? d?.result?.length ?? null;
+    if (count !== null && count > 0) {
+      document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
+    } else {
+      // Try owners endpoint as fallback
+      const r2 = await fetch(
+        'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/owners?chain=bsc&limit=1',
+        { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
+      );
+      const d2 = await r2.json();
+      console.log('Owners response:', JSON.stringify(d2));
+      const count2 = d2?.total ?? d2?.totalCount ?? null;
+      if (count2 !== null && count2 > 0) {
+        document.getElementById('s-holders').textContent = parseInt(count2).toLocaleString();
+      }
     }
-  } catch(e) {}
+  } catch(e) { console.log('Holders error:', e.message); }
 }
 
 // ── FAQ ──
