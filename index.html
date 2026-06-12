@@ -1283,30 +1283,48 @@ async function fetchDexData() {
 }
 
 async function fetchHolders() {
+  // Method 1: GoPlus Security API — free, no key, no CORS, used by DexTools etc.
+  try {
+    const r = await fetch(
+      'https://api.gopluslabs.io/api/v1/token_security/56?contract_addresses=0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b'
+    );
+    const d = await r.json();
+    const info = d?.result?.['0x82ece2bb9e1f3e0b19afe141ef61c0745e28c75b'];
+    const count = info?.holder_count;
+    if (count && parseInt(count) > 0) {
+      document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
+      return;
+    }
+  } catch(e) {}
+
+  // Method 2: Moralis owners endpoint (fallback)
+  try {
+    const r = await fetch(
+      'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/owners?chain=bsc&limit=100&order=DESC',
+      { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
+    );
+    const d = await r.json();
+    if (d && d.result && Array.isArray(d.result)) {
+      let count = d.total;
+      if (!count || count <= 0) count = d.result.length;
+      if (count > 0) {
+        document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
+        return;
+      }
+    }
+  } catch(e) {}
+
+  // Method 3: Moralis holders endpoint (final fallback)
   try {
     const r = await fetch(
       'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/holders?chain=bsc',
       { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
     );
     const d = await r.json();
-    console.log('Holders response:', JSON.stringify(d));
-    const count = d?.totalHolders ?? d?.total ?? d?.result?.length ?? null;
-    if (count !== null && count > 0) {
-      document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
-    } else {
-      // Try owners endpoint as fallback
-      const r2 = await fetch(
-        'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/owners?chain=bsc&limit=1',
-        { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
-      );
-      const d2 = await r2.json();
-      console.log('Owners response:', JSON.stringify(d2));
-      const count2 = d2?.total ?? d2?.totalCount ?? null;
-      if (count2 !== null && count2 > 0) {
-        document.getElementById('s-holders').textContent = parseInt(count2).toLocaleString();
-      }
+    if (typeof d.totalHolders === 'number' && d.totalHolders > 0) {
+      document.getElementById('s-holders').textContent = d.totalHolders.toLocaleString();
     }
-  } catch(e) { console.log('Holders error:', e.message); }
+  } catch(e) {}
 }
 
 // ── FAQ ──
