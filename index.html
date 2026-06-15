@@ -1388,17 +1388,37 @@ async function fetchDexData() {
 }
 
 async function fetchHolders() {
-  // Primary: Vercel serverless function calling BSCScan directly (matches BSCScan exactly)
+  // Show fallback immediately
+  document.getElementById('s-holders').textContent = '315+';
+
+  // Method 1: Moralis /holders endpoint (fresh account key)
   try {
-    const r = await fetch('/api/holders-da');
+    const r = await fetch(
+      'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/holders?chain=bsc',
+      { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImE4NzRmYzNhLWQ1ODItNDVkZC04NzM5LTAzODYxNTNjZjQ5NCIsIm9yZ0lkIjoiNTE5ODM5IiwidXNlcklkIjoiNTM0OTY0IiwidHlwZUlkIjoiZjI1YzZlMjEtNjgxYi00MWU3LWIzZTctZTAyNzMwMTM3Y2JiIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3ODE1MDU3MjEsImV4cCI6NDkzNzI2NTcyMX0.b450v1HpdEo9uhVk2orKQngjEHIHrhts6kQyAgM-aT4', 'accept': 'application/json' } }
+    );
     const d = await r.json();
-    if (d.success && d.formatted) {
-      document.getElementById('s-holders').textContent = d.formatted;
+    if (typeof d.totalHolders === 'number' && d.totalHolders > 0) {
+      document.getElementById('s-holders').textContent = d.totalHolders.toLocaleString();
       return;
     }
   } catch(e) {}
 
-  // Fallback: Ankr
+  // Method 2: Moralis /owners endpoint
+  try {
+    const r = await fetch(
+      'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/owners?chain=bsc&limit=100',
+      { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImE4NzRmYzNhLWQ1ODItNDVkZC04NzM5LTAzODYxNTNjZjQ5NCIsIm9yZ0lkIjoiNTE5ODM5IiwidXNlcklkIjoiNTM0OTY0IiwidHlwZUlkIjoiZjI1YzZlMjEtNjgxYi00MWU3LWIzZTctZTAyNzMwMTM3Y2JiIiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3ODE1MDU3MjEsImV4cCI6NDkzNzI2NTcyMX0.b450v1HpdEo9uhVk2orKQngjEHIHrhts6kQyAgM-aT4', 'accept': 'application/json' } }
+    );
+    const d = await r.json();
+    const count = d?.total;
+    if (count && parseInt(count) > 0) {
+      document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
+      return;
+    }
+  } catch(e) {}
+
+  // Method 3: Ankr
   try {
     const r = await fetch('https://rpc.ankr.com/multichain', {
       method: 'POST',
@@ -1411,7 +1431,7 @@ async function fetchHolders() {
     });
     const d = await r.json();
     const count = d?.result?.holdersCount;
-    if (count && parseInt(count) > 0) {
+    if (count && parseInt(count) > 50) {
       document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
     }
   } catch(e) {}
