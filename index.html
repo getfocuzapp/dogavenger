@@ -1388,7 +1388,26 @@ async function fetchDexData() {
 }
 
 async function fetchHolders() {
-  // Method 1: GoPlus Security API — free, no key, no CORS, used by DexTools etc.
+  // Method 1: Ankr — free, no key, counts ALL holders including airdrops
+  try {
+    const r = await fetch('https://rpc.ankr.com/multichain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0', method: 'ankr_getTokenHolders',
+        params: { blockchain: 'bsc', contractAddress: '0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b', pageSize: 1 },
+        id: 1
+      })
+    });
+    const d = await r.json();
+    const count = d?.result?.holdersCount;
+    if (count && parseInt(count) > 0) {
+      document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
+      return;
+    }
+  } catch(e) {}
+
+  // Method 2: GoPlus Security API
   try {
     const r = await fetch(
       'https://api.gopluslabs.io/api/v1/token_security/56?contract_addresses=0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b'
@@ -1402,24 +1421,7 @@ async function fetchHolders() {
     }
   } catch(e) {}
 
-  // Method 2: Moralis owners endpoint (fallback)
-  try {
-    const r = await fetch(
-      'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/owners?chain=bsc&limit=100&order=DESC',
-      { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
-    );
-    const d = await r.json();
-    if (d && d.result && Array.isArray(d.result)) {
-      let count = d.total;
-      if (!count || count <= 0) count = d.result.length;
-      if (count > 0) {
-        document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
-        return;
-      }
-    }
-  } catch(e) {}
-
-  // Method 3: Moralis holders endpoint (final fallback)
+  // Method 3: Moralis (final fallback)
   try {
     const r = await fetch(
       'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/holders?chain=bsc',
