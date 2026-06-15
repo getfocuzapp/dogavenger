@@ -1388,7 +1388,17 @@ async function fetchDexData() {
 }
 
 async function fetchHolders() {
-  // Method 1: Ankr — free, no key, counts ALL holders including airdrops
+  // Primary: Vercel serverless function calling BSCScan directly (matches BSCScan exactly)
+  try {
+    const r = await fetch('/api/holders-da');
+    const d = await r.json();
+    if (d.success && d.formatted) {
+      document.getElementById('s-holders').textContent = d.formatted;
+      return;
+    }
+  } catch(e) {}
+
+  // Fallback: Ankr
   try {
     const r = await fetch('https://rpc.ankr.com/multichain', {
       method: 'POST',
@@ -1403,33 +1413,6 @@ async function fetchHolders() {
     const count = d?.result?.holdersCount;
     if (count && parseInt(count) > 0) {
       document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
-      return;
-    }
-  } catch(e) {}
-
-  // Method 2: GoPlus Security API
-  try {
-    const r = await fetch(
-      'https://api.gopluslabs.io/api/v1/token_security/56?contract_addresses=0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b'
-    );
-    const d = await r.json();
-    const info = d?.result?.['0x82ece2bb9e1f3e0b19afe141ef61c0745e28c75b'];
-    const count = info?.holder_count;
-    if (count && parseInt(count) > 0) {
-      document.getElementById('s-holders').textContent = parseInt(count).toLocaleString();
-      return;
-    }
-  } catch(e) {}
-
-  // Method 3: Moralis (final fallback)
-  try {
-    const r = await fetch(
-      'https://deep-index.moralis.io/api/v2.2/erc20/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b/holders?chain=bsc',
-      { headers: { 'X-API-Key': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6ImFjZmI4MjE3LTc3OWQtNDdjYy04YjM5LTk4MmRiZDY1ODczNSIsIm9yZ0lkIjoiNTE3NzAxIiwidXNlcklkIjoiNTMyNzc3IiwidHlwZUlkIjoiN2JhMjJmYTctZjgzMS00NTBkLWIwYTktZmE1NWRhMjI2OWI2IiwidHlwZSI6IlBST0pFQ1QiLCJpYXQiOjE3Nzk4NzE3MDksImV4cCI6NDkzNTYzMTcwOX0.zFtOBApU3sLuNBp0uUzaqYwJ-3HlAARbZFCjPJ20vkA', 'accept': 'application/json' } }
-    );
-    const d = await r.json();
-    if (typeof d.totalHolders === 'number' && d.totalHolders > 0) {
-      document.getElementById('s-holders').textContent = d.totalHolders.toLocaleString();
     }
   } catch(e) {}
 }
