@@ -919,7 +919,7 @@ footer {
         <div class="stat-icon">👥</div>
         <div class="stat-label">Holders</div>
         <div class="stat-value" id="s-holders">—</div>
-        <div class="stat-sub">Token holders</div>
+        <a href="https://bscscan.com/token/0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b#balances" target="_blank" class="stat-sub" style="color:var(--gold);font-weight:600;text-decoration:none;font-size:0.78rem;">View on BSCScan →</a>
       </div>
       <div class="stat-card">
         <div class="stat-icon">💧</div>
@@ -1389,7 +1389,7 @@ async function fetchDexData() {
 
 async function fetchHolders() {
   // Show fallback immediately
-  document.getElementById('s-holders').textContent = '315+';
+  document.getElementById('s-holders').textContent = '300+';
 
   // Method 1: Moralis /holders endpoint (fresh account key)
   try {
