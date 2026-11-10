@@ -488,8 +488,21 @@ section { position: relative; }
 /* ── HOW TO BUY ── */
 .howtobuy-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+}
+.step-ca {
+  font-family: monospace; font-size: 0.68rem; font-weight: 500; letter-spacing: -0.01em;
+  color: var(--charcoal); background: var(--gray-100);
+  border: 1px solid var(--gray-200); border-radius: 10px;
+  padding: 10px 12px; margin-bottom: 14px; word-break: break-all; line-height: 1.5;
+}
+.howtobuy-done {
+  margin-top: 28px; text-align: center;
+  background: var(--gold-pale); border: 1px solid rgba(212,145,26,0.25);
+  border-radius: var(--radius-xl); padding: 20px 24px;
+  font-family: var(--font-display); font-weight: 700; font-size: 1.05rem;
+  color: var(--charcoal);
 }
 .step-card {
   background: var(--white);
@@ -523,7 +536,7 @@ section { position: relative; }
 }
 .step-link:hover { color: var(--gold-light); }
 @media(max-width: 1024px) {
-  .howtobuy-grid { grid-template-columns: repeat(2, 1fr); }
+  .howtobuy-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
 }
 @media(max-width: 768px) {
   .howtobuy-grid { grid-template-columns: 1fr; gap: 16px; }
@@ -1107,27 +1120,24 @@ footer {
       <div class="step-card">
         <div class="step-num">1</div>
         <div class="step-title">Create a Wallet</div>
-        <p class="step-text">Download a BSC-compatible wallet such as Trust Wallet or MetaMask from your app store.</p>
-        <a href="https://trustwallet.com/" class="step-link" target="_blank" rel="noopener noreferrer">Get Trust Wallet →</a>
+        <p class="step-text">Download Owllet Wallet from your app store.</p>
+        <a href="https://affiliate.owlletapp.com/r/3F0DC8" class="step-link" target="_blank" rel="noopener noreferrer">Get Owllet Wallet →</a>
       </div>
       <div class="step-card">
         <div class="step-num">2</div>
         <div class="step-title">Get BNB</div>
-        <p class="step-text">Purchase BNB (BEP-20) from any exchange or directly within your wallet, then transfer it to your wallet address.</p>
+        <p class="step-text">Create an Owllet Pay account and connect your wallet. Send fiat from your local bank account to your Owllet Pay account and convert it to BNB.</p>
+        <a href="https://owlletpay.owlletapp.com/login" class="step-link" target="_blank" rel="noopener noreferrer">Open Owllet Pay →</a>
       </div>
       <div class="step-card">
         <div class="step-num">3</div>
-        <div class="step-title">Connect to PancakeSwap</div>
-        <p class="step-text">Visit PancakeSwap and connect your wallet securely using the WalletConnect option.</p>
-        <a href="https://pancakeswap.finance/swap?outputCurrency=0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b" class="step-link" target="_blank" rel="noopener noreferrer">Open PancakeSwap →</a>
-      </div>
-      <div class="step-card">
-        <div class="step-num">4</div>
         <div class="step-title">Swap for DogAvenger</div>
-        <p class="step-text">Paste the contract address below, set slippage to 2-5%, and confirm your swap.</p>
+        <p class="step-text">Paste the DogAvenger contract address below, set slippage to 0.5% and confirm your swap.</p>
+        <div class="step-ca">0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b</div>
         <button class="step-link" onclick="copyCA()" style="cursor:pointer;border:none;background:none;padding:0;font-family:inherit;">📋 Copy Contract Address</button>
       </div>
     </div>
+    <div class="howtobuy-done">🎉 Congratulations, you're now a Holder (Avenger)!</div>
   </div>
 </section>
 
@@ -1244,7 +1254,7 @@ footer {
       </div>
       <div class="faq-item">
         <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">How do I buy Dog Avenger? <span class="faq-icon">+</span></button>
-        <div class="faq-a" hidden>Get a BSC-compatible wallet (Trust Wallet, MetaMask), purchase BNB, go to PancakeSwap, and swap BNB for DogAvenger using contract address <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:0.82rem;">0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b</code>. Set slippage to 2–5%.</div>
+        <div class="faq-a" hidden>Download Owllet Wallet, create an Owllet Pay account and connect your wallet, convert fiat to BNB, then swap BNB for DogAvenger using contract address <code style="background:var(--gray-100);padding:2px 6px;border-radius:4px;font-size:0.82rem;">0x82ecE2bB9e1f3E0b19aFE141EF61C0745e28c75b</code>. Set slippage to 0.5%.</div>
       </div>
       <div class="faq-item">
         <button class="faq-q" aria-expanded="false" onclick="toggleFaq(this)">What blockchain is Dog Avenger built on? <span class="faq-icon">+</span></button>
